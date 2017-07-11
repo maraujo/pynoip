@@ -21,6 +21,11 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('label', type=str, help='Identification', required=True)
 
+def deleted_all_requests():
+    conn = db_connect.connect()
+    query = conn.execute("DELETE FROM requests")
+    conn.close()
+
 def insert_new_data_in_requests(data):
     conn = db_connect.connect()
     query = conn.execute("INSERT INTO requests (IP, TIME, LABEL) VALUES (?,?,?)", data["ip"], data["now"], data["label"])
@@ -46,6 +51,11 @@ class NoIpRequests(Resource):
     def get(self):
         return {"status":"online"}
 
+class NoIpRequestsDeleteAll(Resource):
+    def get(self):
+        deleted_all_requests()
+        return {'message': "All Instances Deleted"}
+
 class NoIpRequestsList(Resource):
     def get(self, number_results):
         result = select_rows_from_request(number_results)
@@ -54,6 +64,7 @@ class NoIpRequestsList(Resource):
 
 api.add_resource(NoIpRequests, '/')
 api.add_resource(NoIpRequestsList, '/<number_results>')
+api.add_resource(NoIpRequestsDeleteAll, '/delete')
 
 if __name__ == '__main__':
     app.run(port=5002)
