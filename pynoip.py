@@ -67,4 +67,4 @@ api.add_resource(NoIpRequestsList, '/<number_results>')
 api.add_resource(NoIpRequestsDeleteAll, '/delete')
 
 if __name__ == '__main__':
-    app.run(port=5002)
+    app.run(host="162.243.56.142", port=5002)
