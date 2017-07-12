@@ -42,11 +42,14 @@ class NoIpRequests(Resource):
     def post(self):
         args = parser.parse_args()
         data = {}
-        data["ip"] = request.remote_addr
+        if "HTTP_X_REAL_IP" in request.environ:
+            data["ip"] = request.environ.get('HTTP_X_REAL_IP')
+        else:
+            data["ip"] = request.remote_addr
         data["now"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data["label"] = args["label"]
         insert_new_data_in_requests(data)
-        return {'message': "Request Saved"}
+        return {'message': "Request Saved", 'ip': data["ip"]}
 
     def get(self):
         return {"status":"online"}
